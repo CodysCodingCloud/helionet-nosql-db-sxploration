@@ -1,31 +1,31 @@
 services:
-  big-data-mongodb:
-    # 1. Replaces 'my-custom-mongo-image'
-    image: mongo:7.0
-    # 2. Replaces '--name my-mongo'
-    container_name: big-data-mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-    # 3. Replaces '-v mongo_data:/data/db'
-    volumes:
-      - mongo_data:/data/db
-    ports:
-      - "27017:27017"
-    # Optional: ensure it restarts if your computer reboots
-    restart: always
-  big-data-pg:
-    image: postgres:17
-    container_name: big-data-pg
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: postgres
-    volumes:
-      # - ./db:/docker-entrypoint-initdb.d
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+#   big-data-mongodb:
+#     # 1. Replaces 'my-custom-mongo-image'
+#     image: mongo:7.0
+#     # 2. Replaces '--name my-mongo'
+#     container_name: big-data-mongo
+#     environment:
+#       MONGO_INITDB_ROOT_USERNAME: root
+#       MONGO_INITDB_ROOT_PASSWORD: password
+#     # 3. Replaces '-v mongo_data:/data/db'
+#     volumes:
+#       - mongo_data:/data/db
+#     ports:
+#       - "27017:27017"
+#     # Optional: ensure it restarts if your computer reboots
+#     restart: always
+#   big-data-pg:
+#     image: postgres:17
+#     container_name: big-data-pg
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: password
+#       POSTGRES_DB: postgres
+#     volumes:
+#       # - ./db:/docker-entrypoint-initdb.d
+#       - pgdata:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
   big-data-neo4j:
     # Use the official Neo4j image from Docker Hub
     image: neo4j:latest
@@ -46,28 +46,28 @@ services:
       - neo4j_data:/data:/data
       - neo4j_logs:/logs:/logs
       - neo4j_plugins:/plugins:/plugins
-  big-data-cassandra:
-    image: cassandra:latest
-    container_name: big-data-cassandra
-    ports:
-      - "9042:9042"
-    environment:
-      CASSANDRA_CLUSTER_NAME: "MyTestCluster"
-      CASSANDRA_DC: "DC1"
-      CASSANDRA_RACK: "RACK1"
-    volumes:
-      - cassandra-data:/var/lib/cassandra
-    healthcheck:
-      test: [ "CMD", "cqlsh", "-e", "describe keyspaces" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # big-data-cassandra:
+  #   image: cassandra:latest
+  #   container_name: big-data-cassandra
+  #   ports:
+  #     - "9042:9042"
+  #   environment:
+  #     CASSANDRA_CLUSTER_NAME: "MyTestCluster"
+  #     CASSANDRA_DC: "DC1"
+  #     CASSANDRA_RACK: "RACK1"
+  #   volumes:
+  #     - cassandra-data:/var/lib/cassandra
+  #   healthcheck:
+  #     test: [ "CMD", "cqlsh", "-e", "describe keyspaces" ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
 
 # 4. Defines 'mongo_data' so Docker knows it is a named volume
 volumes:
-  mongo_data:
-  pgdata:
+  # mongo_data:
+  # pgdata:
   neo4j_data:
   neo4j_logs:
   neo4j_plugins:
-  cassandra-data:
+  # cassandra-data:
