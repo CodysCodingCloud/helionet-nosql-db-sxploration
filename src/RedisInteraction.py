@@ -1,5 +1,25 @@
 from src.hetionetDBInteraction import hetionetDBInteraction
 
+import redis
+from dotenv import load_dotenv
+
+r = redis.Redis(
+    host = os.getenv('REDIS_HOST')
+    port = int(os.getenv('REDIS_PORT'))
+    password = os.getenv('REDIS_PASSWORD')
+    decode_responses = true
+)
+
+response = r.ping()
+
+try
+if response:
+    print ("Success")
+
+except Exception as e:
+    print("Something was down :( check it out: {e}" )
+
+
 class RedisInteraction(hetionetDBInteraction):
     def db_conn_service():
         pass
