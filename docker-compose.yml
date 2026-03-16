@@ -46,6 +46,22 @@ services:
       - neo4j_data:/data:/data
       - neo4j_logs:/logs:/logs
       - neo4j_plugins:/plugins:/plugins
+  big-data-redis:
+      # Use the latest Redis image from Docker Hub
+    image: redis:latest
+    hostname: redis_local
+    # container_name: redis
+    restart: always
+    # Set environment variables for authentication and license agreement
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      # Exposes the container's Redis port to the host machine.
+      - "6379:6379"
+    volumes:
+      # Mount volumes to persist data, logs, and plugins (adjust local paths as needed)
+      - redis-data:/data
+    command: redis-server --appendonly yes # Enables AOF persistence
   # big-data-cassandra:
   #   image: cassandra:latest
   #   container_name: big-data-cassandra
@@ -70,4 +86,5 @@ volumes:
   neo4j_data:
   neo4j_logs:
   neo4j_plugins:
+  redis-data:
   # cassandra-data:
