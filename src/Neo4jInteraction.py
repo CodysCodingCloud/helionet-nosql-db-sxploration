@@ -179,7 +179,7 @@ def create_node_batch_dict(data) -> dict:
 
 def create_node_batch_tx(tx: ManagedTransaction, data):
     batch_data = create_node_batch_dict(data)
-    res=[]
+    res = []
     for (kind), kind_node_data in batch_data.items():
         unwind_node_query = f"""
         UNWIND $rows AS row
@@ -189,8 +189,10 @@ def create_node_batch_tx(tx: ManagedTransaction, data):
         result = tx.run(unwind_node_query, rows=kind_node_data)
         if DEBUG:
             summary = result.consume()
-            res.append((kind,len(kind_node_data),{summary.counters.nodes_created}))
-            print(kind,len(kind_node_data),{summary.counters.nodes_created},result)
+            res.append((kind, len(kind_node_data), {
+                       summary.counters.nodes_created}))
+            print(kind, len(kind_node_data), {
+                  summary.counters.nodes_created}, result)
     return res
 
 
@@ -210,7 +212,7 @@ def create_edge_batch_data(data) -> dict:
     return edge_dict
 
 
-def create_edge_batch_tx(tx:ManagedTransaction, data: dict):
+def create_edge_batch_tx(tx: ManagedTransaction, data: dict):
     batch_data = create_edge_batch_data(data)
     for (src_label, tgt_label, rel_type), rel_data in batch_data.items():
         if DEBUG:
@@ -219,7 +221,7 @@ def create_edge_batch_tx(tx:ManagedTransaction, data: dict):
             case EDGE_RELATIONS.GrG:
                 rel_dir = '>'
                 rel_type = 'GrG'
-                print(rel_type,rel_dir)
+                print(rel_type, rel_dir)
             case _:
                 rel_dir = ""
 
@@ -233,10 +235,12 @@ def create_edge_batch_tx(tx:ManagedTransaction, data: dict):
         result = tx.run(unwind_query, rows=rel_data)
         if DEBUG:
             summary = result.consume()
-            print(rel_type,{summary},result)
+            print(rel_type, summary, result)
     return
 
 # OLD Version that do one query at a time
+
+
 def create_node_tx(tx: ManagedTransaction, id: str, name, kind):
     id = id.split("::")[1]
     insert_query = f"""
@@ -245,6 +249,7 @@ def create_node_tx(tx: ManagedTransaction, id: str, name, kind):
     result = tx.run(insert_query, id=id, name=name)
     if DEBUG:
         print(result)
+
 
 def create_edge_tx(tx: ManagedTransaction, source: str, edge, target: str):
     # example data
