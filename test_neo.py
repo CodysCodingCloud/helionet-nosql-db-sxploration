@@ -15,3 +15,12 @@ match option:
     case 3:
         inst = Neo4jInteraction()
         inst.populate_edges()
+    case 4:
+        inst = Neo4jInteraction()
+        inst.populate_db()
+    case 5:
+        inst = Neo4jInteraction()
+        inst.check_counts()
+    case 666:
+        inst = Neo4jInteraction()
+        inst.erase_db()
