@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # bash t_mongo.sh 0 dev 5
 STEP=${1:-"1"}
+PYARG=${2:-"1"}
 
 
 if [ "$STEP" = "0" ]; then
@@ -24,5 +25,9 @@ case "$STEP" in
     "t1")
     source .venv/bin/activate
     python src/parse_data.py
+    ;;
+    "t2")
+    source .venv/bin/activate
+    python test_neo.py "$PYARG"
     ;;
 esac
