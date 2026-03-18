@@ -7,6 +7,9 @@ import csv
 
 
 class RedisInteraction(hetionetDBInteraction):
+    def __init__(self):
+        self.db_conn_service()
+        
     def db_conn_service(self):
         load_dotenv()
 
