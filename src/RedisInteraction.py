@@ -1,4 +1,4 @@
-from hetionetDBInteraction import hetionetDBInteraction
+from src.hetionetDBInteraction import hetionetDBInteraction
 import redis
 from dotenv import load_dotenv
 import os

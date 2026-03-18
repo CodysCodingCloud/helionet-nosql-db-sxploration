@@ -21,6 +21,9 @@ match option:
     case 5:
         inst = Neo4jInteraction()
         inst.check_counts()
+    case 7:
+        import src.GUI as gui
+        gui.root.mainloop()
     case 666:
         inst = Neo4jInteraction()
         inst.erase_db()
