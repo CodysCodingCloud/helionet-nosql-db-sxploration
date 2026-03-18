@@ -22,3 +22,6 @@ sudo apt-get update
 sudo apt-get install redis
 
 docker run -d --name redis -p 6379:6379 redis:<version>
+
+<!-- Installin ttkbootstrap for UI -->
+python -m pip install ttkbootstrap
