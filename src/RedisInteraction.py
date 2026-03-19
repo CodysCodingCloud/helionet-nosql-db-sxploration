@@ -77,34 +77,38 @@ class RedisInteraction(hetionetDBInteraction):
                     continue  
 
                 cfg = self.DISEASE_EDGE_MAP[meta]
-                disease_id_full = row[cfg["disease_end"]]   
+
+                # figure out disease position
+                dicease_id_full = row[cfg["disease_end"]]   
                 other_id        = row["target"] if cfg["disease_end"] == "source" else row["source"]
 
-                disease_id = disease_id_full.replace("Disease::", "")
+                
+                disease_id = dicease_id_full.replace("Disease::", "")
 
+                # create new instances if new disease
                 if disease_id not in disease_data:
                     disease_data[disease_id] = {"drugs": [], "genes": [], "locations": []}
 
+                # else append data to existing node
                 if other_id in nodes:
                     disease_data[disease_id][cfg["field"]].append(nodes[other_id]["name"])
 
-
+        # hash inserted data
         for disease_id, fields in disease_data.items():
             full_id = f"Disease::{disease_id}"
             self.r.hset(f"disease:{disease_id}", mapping={
-                "name":      nodes.get(full_id, {}).get("name", "Unknown"),
+                "name":      nodes.get(full_id, {}).get("name"),
                 "drugs":     ",".join(set(fields["drugs"])),  
                 "genes":     ",".join(set(fields["genes"])),
                 "locations": ",".join(set(fields["locations"])),
             })
 
-        print(f"Diseases loaded into Redis.")
 
 
 
     def get_all_diseases(self):
         pass
-        
+
     def get_disease_by_id(self, disease_id):
         """
         Given a disease id, what is its name, what are drug names that can treat or palliate this disease, what are gene names that cause this disease, and where this disease occurs? Obtain and output this information in a single query.
