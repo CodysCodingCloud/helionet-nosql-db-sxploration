@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
@@ -5,6 +9,11 @@ from ttkbootstrap.widgets.scrolled import ScrolledText
 from PIL import ImageTk, Image
 from src.RedisInteraction import RedisInteraction
 from src.Neo4jInteraction import Neo4jInteraction
+from src.constants import DB_USAGE_TYPE_ENUMS
+
+# use both db types as a default
+DB_USAGE_TYPE = int(os.getenv('DB_USAGE_TYPE', DB_USAGE_TYPE_ENUMS.both)) 
+print(DB_USAGE_TYPE)
 
 redis = RedisInteraction()
 neo = Neo4jInteraction()
@@ -30,10 +39,17 @@ def close_GUI():
 def get_disease_id():
     user_input = entry1.get()
     if user_input:
-        data = redis.get_disease_by_id(user_input)
+        match(DB_USAGE_TYPE):
+            case DB_USAGE_TYPE_ENUMS.neo:
+                print("usingneo")
+                data = neo.get_disease_by_id(user_input)
+            case _:
+                print("usingred")
+                data = redis.get_disease_by_id(user_input)
+
     else:
         print("I didn't get that, can please you enter the disease ID again?")        
-
+    print("gotdata",data)
     report = (f"DISEASE: {data['name']}\n"
               f"DRUGS: {', '.join(data['drugs'])}\n"
               f"LOCATIONS: {', '.join(data['locations'])}\n"
@@ -51,7 +67,11 @@ def get_compounds():
     user_input = entry1.get()
     output_text = 'Empty'
     if user_input:
-        compound_list = neo.get_disease_drug_interactions_by_id(user_input)
+        match(DB_USAGE_TYPE):
+            case DB_USAGE_TYPE_ENUMS.redis:
+                compound_list = redis.get_disease_drug_interactions_by_id(user_input)
+            case _:
+                compound_list = neo.get_disease_drug_interactions_by_id(user_input)
         if not compound_list:
             output_text = "Ups! No compounds on sight"
         else:
