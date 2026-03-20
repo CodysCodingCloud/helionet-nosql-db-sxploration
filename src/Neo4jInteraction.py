@@ -22,7 +22,8 @@ class Neo4jInteraction(hetionetDBInteraction):
         driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
         # Optional: Verify connectivity
         driver.verify_connectivity()
-        print("Connection successful!")
+        if DEBUG:
+            print("Connection successful!")
         return driver
         # session = driver.session(database=DATABASE_NAME)
         # return session
@@ -55,7 +56,8 @@ class Neo4jInteraction(hetionetDBInteraction):
             print(e)
             res = []
         finally:
-            print("get_all_diseases completed")
+            if DEBUG:
+                print("get_all_diseases completed")
         return res
 
     def get_disease_by_id(self, disease_id) -> dict:
@@ -73,7 +75,8 @@ class Neo4jInteraction(hetionetDBInteraction):
             print(e)
             res = {}
         finally:
-            print("get_all_diseases completed")
+            if DEBUG:
+                print("get_all_diseases completed")
         return res
 
     def get_disease_drug_interactions_by_id(self, disease_id):
@@ -91,7 +94,8 @@ class Neo4jInteraction(hetionetDBInteraction):
             print(e)
             res = {}
         finally:
-            print("get_all_diseases completed")
+            if DEBUG:
+                print("get_all_diseases completed")
         return res
         # pass
 
@@ -121,7 +125,8 @@ class Neo4jInteraction(hetionetDBInteraction):
         except Exception as e:
             print(e)
         finally:
-            print("populate_nodes completed")
+            if DEBUG:
+                print("populate_nodes completed")
 
     def populate_edges(self, driver: Driver = None):
         try:
@@ -158,12 +163,14 @@ class Neo4jInteraction(hetionetDBInteraction):
         records, summary, keys = driver.execute_query(
             del_query, database_=DB_NAME)
         # get all constrains
-        print("node removal:", records, summary, keys)
+        if DEBUG:
+            print("node removal:", records, summary, keys)
         result = driver.execute_query(
             "SHOW CONSTRAINTS YIELD name",
             database_=DB_NAME
         )
-        print("get constraints:", result)
+        if DEBUG:
+            print("get constraints:", result)
         constraint_names = [record["name"] for record in result.records]
         # drop all constrains
         for name in constraint_names:
@@ -171,7 +178,8 @@ class Neo4jInteraction(hetionetDBInteraction):
                 f"DROP CONSTRAINT {name} IF EXISTS",
                 database_=DB_NAME
             )
-            print(f"Dropped constraint: {name}")
+            if DEBUG:
+                print(f"Dropped constraint: {name}")
 
         # session.close()
         driver.close()

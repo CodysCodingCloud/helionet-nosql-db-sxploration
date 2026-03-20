@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from src.constants import EDGE_RELATIONS
 load_dotenv()
 dd = os.getenv('DEBUG', '0')
-print(dd)
 DEBUG = bool(os.getenv('DEBUG', '0') == "1")
 ALL_EDGES = bool(os.getenv('ALL_EDGES', '0') == "1")
 required_edges = ['DuG', 'DdG', 'CdG', 'CuG', 'CtD']
@@ -26,11 +25,11 @@ def get_disease_by_id(tx: ManagedTransaction, disease_id):
     print("gotid: ", disease_id)
     query = """
         MATCH (d:Disease {id: $disease_id})
-        OPTIONAL MATCH (d)-[]-(dr:Drug)
+        OPTIONAL MATCH (d)-[]-(c:Compound)
         OPTIONAL MATCH (d)-[]-(a:Anatomy)
         OPTIONAL MATCH (d)-[]-(g:Gene)
         WITH d, 
-            collect(distinct dr.name) AS drugs, 
+            collect(distinct c.name) AS drugs, 
             collect(distinct a.name) AS locations, 
             collect(distinct g.name) AS genes
         RETURN {
