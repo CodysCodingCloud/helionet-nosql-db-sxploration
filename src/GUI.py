@@ -43,6 +43,8 @@ def get_all_diseases():
             data = neo.get_all_diseases()
         case _:
             data = redis.get_all_diseases()
+    if isinstance(data[0], dict):
+        data = [dat.get('id') for dat in data]
     return data
 
 
@@ -113,6 +115,18 @@ label1.pack(padx=20, pady=40)
 
 # display
 
+
+# space for user input
+disease_id_lb = ttk.Label(
+    root, text="Enter you disease id:", font=("Times New Roman", 24))
+disease_id_lb.pack(padx=5, pady=10)
+# entry1 = ttk.Entry(root,  bootstyle="secondary")
+options=get_all_diseases()
+# dropdown for diseases
+entry1 = ttk.Combobox(root, font=("Times New Roman", 24), values=options, bootstyle="info")
+entry1.pack(pady=10)
+entry1.set("DOID:0050742")
+
 # find elements related to diseases
 button1 = ttk.Button(root, text="Let's find your disease associates!",
                      style="success.TButton", command=get_disease_id)
@@ -124,12 +138,6 @@ button2 = ttk.Button(root, text="Let's find compounds!",
                      style="info.TButton", command=get_compounds)
 button2.pack(padx=5, pady=10)
 
-# space for user input
-disease_id_lb = ttk.Label(
-    root, text="Enter you disease id:", font=("Times New Roman", 24))
-disease_id_lb.pack(padx=5, pady=10)
-entry1 = ttk.Entry(root,  bootstyle="secondary")
-entry1.pack(pady=10)
 
 
 # space for results
