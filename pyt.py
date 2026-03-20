@@ -25,7 +25,7 @@ def get_disease_info(disease_id, mode):
             if not compound_list:
                 output_text = "Ups! No compounds on sight"
             else:
-                output_text = "Here is the compunds list:\nname\t\tid" + "\n".join([f"{item['name']}\t({item['id']})" for item in compound_list])
+                output_text = "Here is the compunds list:\nname\t\tid\n" + "\n".join([f"{item['name']}\t({item['id']})" for item in compound_list])
             print(output_text)
 
 
