@@ -1,4 +1,6 @@
 # pymongo
 # cassandra-driver
 neo4j
+redis
 python-dotenv
+ttkbootstrap
