@@ -17,9 +17,16 @@ elif [ "$STEP" = "3" ]; then
     python -m pip install -r requirements.txt
     # python gcloud_deploy_rf.sh local 11
 elif [ "$STEP" = "4" ]; then
+    # for running GUI version of the project 
     source .venv/bin/activate
     python -m pip install -r requirements.txt
     python main.py
+    # python gcloud_deploy_rf.sh local 11
+elif [ "$STEP" = "5" ]; then
+    # for running python terminal version of the project 
+    source .venv/bin/activate
+    python -m pip install -r requirements.txt
+    python pyt.py
     # python gcloud_deploy_rf.sh local 11
 elif [ "$STEP" = "666" ]; then
     docker compose down -v
