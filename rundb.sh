@@ -2,6 +2,7 @@
 # bash t_mongo.sh 0 dev 5
 STEP=${1:-"1"}
 PYARG=${2:-"1"}
+DISEASE_ID=${3:-"DOID:0050742"}
 
 
 if [ "$STEP" = "0" ]; then
@@ -33,6 +34,6 @@ case "$STEP" in
     ;;
     "t2")
     source .venv/bin/activate
-    python test_neo.py "$PYARG"
+    python test_neo.py "$PYARG" "$DISEASE_ID"
     ;;
 esac

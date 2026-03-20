@@ -7,7 +7,10 @@ print(dd)
 option = 0
 if len(sys.argv) > 1:
     option = int(sys.argv[1])
+# default id or retrieve from arguments
 disease_id = "DOID:0050742"
+if len(sys.argv) > 2:
+    disease_id = sys.argv[2]
 data = "nodata retrieved"
 match option:
     case 1:
