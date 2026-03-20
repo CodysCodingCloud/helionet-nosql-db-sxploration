@@ -91,7 +91,7 @@ def get_compounds():
         if not compound_list:
             output_text = "Ups! No compounds on sight"
         else:
-            output_text = f"Here is the compunds list:\n{compound_list}"
+            output_text = "Here is the compunds list:\nname\t\tid\n" + "\n".join([f"{item['name']}\t({item['id']})" for item in compound_list])
     else:
         output_text = "I didn't get that, can you please enter the disease ID again?"
 
