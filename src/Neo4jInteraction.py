@@ -1,13 +1,13 @@
-from importlib.util import source_from_cache
-from socket import create_server
-
-from src.hetionetDBInteraction import hetionetDBInteraction
-from neo4j import GraphDatabase, Driver, Session, ManagedTransaction
-from dotenv import load_dotenv
-from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
+import src.neoTransactions as neoTransactions
 from src.constants import EDGE_RELATIONS
+from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
+from neo4j import GraphDatabase, Driver, Session
+from src.hetionetDBInteraction import hetionetDBInteraction
 import os
+from dotenv import load_dotenv
 load_dotenv()
+
+
 HOST = os.getenv('NEO_HOST', "bolt://localhost")
 PORT = int(os.getenv('NEO_PORT', 7687))
 USERNAME = os.getenv('NEO_USER', "neo4j")
@@ -22,7 +22,8 @@ class Neo4jInteraction(hetionetDBInteraction):
         driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
         # Optional: Verify connectivity
         driver.verify_connectivity()
-        print("Connection successful!")
+        if DEBUG:
+            print("Connection successful!")
         return driver
         # session = driver.session(database=DATABASE_NAME)
         # return session
@@ -45,18 +46,57 @@ class Neo4jInteraction(hetionetDBInteraction):
             print("populated db")
 
     def get_all_diseases(self):
-        pass
+        try:
+            _driver = self.db_conn_service()
+            session: Session = _driver.session(database=DB_NAME)
+            res = session.execute_read(neoTransactions.get_all_diseases)
+            session.close()
+            _driver.close()
+        except Exception as e:
+            print(e)
+            res = []
+        finally:
+            if DEBUG:
+                print("get_all_diseases completed")
+        return res
 
     def get_disease_by_id(self, disease_id) -> dict:
         """
         Given a disease id, what is its name, what are drug names that can treat or palliate this disease, what are gene names that cause this disease, and where this disease occurs? Obtain and output this information in a single query.
         """
-        pass
+        try:
+            _driver = self.db_conn_service()
+            session: Session = _driver.session(database=DB_NAME)
+            res = session.execute_read(
+                neoTransactions.get_disease_by_id, disease_id)
+            session.close()
+            _driver.close()
+        except Exception as e:
+            print(e)
+            res = {}
+        finally:
+            if DEBUG:
+                print("get_all_diseases completed")
+        return res
 
     def get_disease_drug_interactions_by_id(self, disease_id):
         """
         We assume that a compound can treat a disease if the compound up-regulates/down-regulates a gene, but the location down-regulates/up-regulates the gene in an opposite direction where the disease occurs. Find all compounds that can treat a new disease (i.e. the missing edges between compound and disease excluding existing drugs). Obtain and output all drugs in a single query.
         """
+        try:
+            _driver = self.db_conn_service()
+            session: Session = _driver.session(database=DB_NAME)
+            res = session.execute_read(
+                neoTransactions.get_disease_drug_interactions_by_id, disease_id)
+            session.close()
+            _driver.close()
+        except Exception as e:
+            print(e)
+            res = {}
+        finally:
+            if DEBUG:
+                print("get_all_diseases completed")
+        return res
         # pass
 
     def populate_nodes(self, driver: Driver = None):
@@ -71,7 +111,8 @@ class Neo4jInteraction(hetionetDBInteraction):
                 session: Session = _driver.session(database=DB_NAME)
             else:
                 session: Session = driver.session(database=DB_NAME)
-            session.execute_write(create_node_batch_tx, node_data)
+            session.execute_write(
+                neoTransactions.create_node_batch_tx, node_data)
             # for node in node_data:
             #     session.execute_write(
             #         create_node_tx, id=node[0], name=node[1], kind=node[2])
@@ -84,7 +125,8 @@ class Neo4jInteraction(hetionetDBInteraction):
         except Exception as e:
             print(e)
         finally:
-            print("populate_nodes completed")
+            if DEBUG:
+                print("populate_nodes completed")
 
     def populate_edges(self, driver: Driver = None):
         try:
@@ -98,7 +140,8 @@ class Neo4jInteraction(hetionetDBInteraction):
                 session: Session = _driver.session(database=DB_NAME)
             else:
                 session: Session = driver.session(database=DB_NAME)
-            session.execute_write(create_edge_batch_tx, node_data)
+            session.execute_write(
+                neoTransactions.create_edge_batch_tx, node_data)
 
             # for node in node_data:
             #     session.execute_write(
@@ -120,12 +163,14 @@ class Neo4jInteraction(hetionetDBInteraction):
         records, summary, keys = driver.execute_query(
             del_query, database_=DB_NAME)
         # get all constrains
-        print("node removal:", records, summary, keys)
+        if DEBUG:
+            print("node removal:", records, summary, keys)
         result = driver.execute_query(
             "SHOW CONSTRAINTS YIELD name",
             database_=DB_NAME
         )
-        print("get constraints:", result)
+        if DEBUG:
+            print("get constraints:", result)
         constraint_names = [record["name"] for record in result.records]
         # drop all constrains
         for name in constraint_names:
@@ -133,7 +178,8 @@ class Neo4jInteraction(hetionetDBInteraction):
                 f"DROP CONSTRAINT {name} IF EXISTS",
                 database_=DB_NAME
             )
-            print(f"Dropped constraint: {name}")
+            if DEBUG:
+                print(f"Dropped constraint: {name}")
 
         # session.close()
         driver.close()
@@ -153,114 +199,3 @@ class Neo4jInteraction(hetionetDBInteraction):
         # record = result.records[0]
         # print(f"Nodes: {record['nodeCount']}")
         # print(f"Relationships: {record['relCount']}")
-
-
-def add_constraints(tx: ManagedTransaction):
-    query = """
-    CREATE CONSTRAINT FOR (n:Gene) REQUIRE n.id IS UNIQUE;
-    CREATE CONSTRAINT FOR (n:Compound) REQUIRE n.id IS UNIQUE;
-    CREATE CONSTRAINT FOR (n:Disease) REQUIRE n.id IS UNIQUE;
-    CREATE CONSTRAINT FOR (n:Anatomy) REQUIRE n.id IS UNIQUE;
-    """
-    tx.run(query)
-
-
-def create_node_batch_dict(data) -> dict:
-    node_dict = {}
-    for row in data:
-        id = row[0].split("::")[1]
-        name = row[1]
-        kind = row[2]
-        elem_value = {"id": id, "name": name}
-        node_dict.setdefault(kind, [])
-        node_dict[kind].append(elem_value)
-    return node_dict
-
-
-def create_node_batch_tx(tx: ManagedTransaction, data):
-    batch_data = create_node_batch_dict(data)
-    res = []
-    for (kind), kind_node_data in batch_data.items():
-        unwind_node_query = f"""
-        UNWIND $rows AS row
-        CREATE (a:{kind} {{id:row.id, name: row.name}})
-        RETURN count(a) AS created_count
-        """
-        result = tx.run(unwind_node_query, rows=kind_node_data)
-        if DEBUG:
-            summary = result.consume()
-            res.append((kind, len(kind_node_data), {
-                       summary.counters.nodes_created}))
-            print(kind, len(kind_node_data), {
-                  summary.counters.nodes_created}, result)
-    return res
-
-
-def create_edge_batch_data(data) -> dict:
-    edge_dict = {}
-    for row in data:
-        source = row[0]
-        edge = row[1]
-        target = row[2]
-        [source_label, source_id] = source.split("::")
-        [target_label, target_id] = target.split("::")
-        key = (source_label, target_label, edge)
-        elem_value = {"src": source_id, "tgt": target_id}
-
-        edge_dict.setdefault(key, [])
-        edge_dict[key].append(elem_value)
-    return edge_dict
-
-
-def create_edge_batch_tx(tx: ManagedTransaction, data: dict):
-    batch_data = create_edge_batch_data(data)
-    for (src_label, tgt_label, rel_type), rel_data in batch_data.items():
-        if DEBUG:
-            print(src_label, rel_type, tgt_label, len(rel_data))
-        match rel_type:
-            case EDGE_RELATIONS.GrG:
-                rel_dir = '>'
-                rel_type = 'GrG'
-                print(rel_type, rel_dir)
-            case _:
-                rel_dir = ""
-
-        unwind_query = f"""
-        UNWIND $rows AS row
-        MATCH (s:{src_label} {{id: row.src}})
-        MATCH (t:{tgt_label} {{id: row.tgt}})
-        MERGE (s)-[r:{rel_type}]-{rel_dir}(t)
-        """
-
-        result = tx.run(unwind_query, rows=rel_data)
-        if DEBUG:
-            summary = result.consume()
-            print(rel_type, summary, result)
-    return
-
-# OLD Version that do one query at a time
-
-
-def create_node_tx(tx: ManagedTransaction, id: str, name, kind):
-    id = id.split("::")[1]
-    insert_query = f"""
-    CREATE (a:{kind} {{id:$id, name: $name}})
-    """
-    result = tx.run(insert_query, id=id, name=name)
-    if DEBUG:
-        print(result)
-
-
-def create_edge_tx(tx: ManagedTransaction, source: str, edge, target: str):
-    # example data
-    # Anatomy::UBERON:0000007	AuG	Gene::83480
-    [source_label, source_id] = source.split("::")
-    [target_label, target_id] = target.split("::")
-    insert_query = f"""
-    MATCH (s:{source_label} {{id: $source_id}})
-    MATCH (t:{target_label}  {{id: $target_id}})
-    MERGE (s)-[:{edge}]->(t)
-    """
-    result = tx.run(insert_query, source_id=source_id, target_id=target_id)
-    if DEBUG:
-        print(result)

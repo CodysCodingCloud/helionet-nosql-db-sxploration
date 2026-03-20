@@ -5,6 +5,8 @@ EDGES_FN = "edges.tsv"
 NODES_FN = "nodes.tsv"
 
 working_directory = os.path.dirname(__file__)
+
+
 class DATA_FILE_LOCATIONS:
     node = file_location = os.path.abspath(
         os.path.join(working_directory, "..", NODES_FN))
@@ -12,7 +14,7 @@ class DATA_FILE_LOCATIONS:
         os.path.join(working_directory, "..", EDGES_FN))
 
 
-def get_data_from_file(file_location:DATA_FILE_LOCATIONS=DATA_FILE_LOCATIONS.node, DEBUG=False):
+def get_data_from_file(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.node, DEBUG=False):
     """
     returns a tuple = ( header, data )
     header contains a list of names of the column
@@ -39,12 +41,12 @@ def get_data_from_file(file_location:DATA_FILE_LOCATIONS=DATA_FILE_LOCATIONS.nod
             print(header)  # ['id', 'name', 'kind']
             # ['Anatomy::UBERON:0000011', 'parasympathetic nervous system', 'Anatomy']
             print(data[5])
-            kind_set=set()
-            if file_location==DATA_FILE_LOCATIONS.node:
+            kind_set = set()
+            if file_location == DATA_FILE_LOCATIONS.node:
                 for node in data:
                     kind_set.add(node[2])
                 print(f"node Labels: {kind_set}")
-            else :
+            else:
                 for node in data:
                     kind_set.add(node[1])
                 print(f"meta edge Labels: {kind_set}")

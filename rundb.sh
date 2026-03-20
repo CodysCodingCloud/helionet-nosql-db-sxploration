@@ -2,6 +2,7 @@
 # bash t_mongo.sh 0 dev 5
 STEP=${1:-"1"}
 PYARG=${2:-"1"}
+DISEASE_ID=${3:-"DOID:0050742"}
 
 
 if [ "$STEP" = "0" ]; then
@@ -14,6 +15,18 @@ elif [ "$STEP" = "2" ]; then
 elif [ "$STEP" = "3" ]; then
     source .venv/bin/activate
     python -m pip install -r requirements.txt
+    # python gcloud_deploy_rf.sh local 11
+elif [ "$STEP" = "4" ]; then
+    # for running GUI version of the project 
+    source .venv/bin/activate
+    python -m pip install -r requirements.txt
+    python main.py
+    # python gcloud_deploy_rf.sh local 11
+elif [ "$STEP" = "5" ]; then
+    # for running python terminal version of the project 
+    source .venv/bin/activate
+    python -m pip install -r requirements.txt
+    python pyt.py
     # python gcloud_deploy_rf.sh local 11
 elif [ "$STEP" = "666" ]; then
     docker compose down -v
@@ -28,6 +41,6 @@ case "$STEP" in
     ;;
     "t2")
     source .venv/bin/activate
-    python test_neo.py "$PYARG"
+    python test_neo.py "$PYARG" "$DISEASE_ID"
     ;;
 esac
