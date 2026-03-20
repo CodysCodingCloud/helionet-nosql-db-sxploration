@@ -35,3 +35,9 @@ class EDGE_RELATIONS:
     CtD='CtD' # Compound treats Disease
     CdG='CdG' # Compound downregulates Gene
     GiG='GiG' # Gene interacts with Gene
+
+
+class DB_USAGE_TYPE_ENUMS:
+    neo=1
+    redis=2
+    both=3

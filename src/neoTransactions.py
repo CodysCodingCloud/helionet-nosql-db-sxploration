@@ -20,14 +20,33 @@ def get_all_diseases(tx: ManagedTransaction):
         print(result)
     return [record.data()['a'] for record in result]
 def get_disease_by_id(tx: ManagedTransaction,disease_id):
+    print("gotid: ",disease_id)
     query = """
-    MATCH (d:Disease {id: $disease_id})
-    RETURN d
+        MATCH (d:Disease {id: $disease_id})
+        OPTIONAL MATCH (d)-[]-(dr:Drug)
+        OPTIONAL MATCH (d)-[]-(a:Anatomy)
+        OPTIONAL MATCH (d)-[]-(g:Gene)
+        WITH d, 
+            collect(distinct dr.name) AS drugs, 
+            collect(distinct a.name) AS locations, 
+            collect(distinct g.name) AS genes
+        RETURN {
+            name: d.name,
+            id:d.id,
+            drugs: drugs,
+            locations: locations,
+            genes: genes
+        } AS data
     """
     result = tx.run(query,disease_id=disease_id)
     if DEBUG:
         print(result)
-    return [record.data()['d'] for record in result]
+    try:
+        return result.data()[0]['data']
+    except Exception as e:
+        print(e)
+        return result.data()
+    
 def get_disease_drug_interactions_by_id(tx: ManagedTransaction,disease_id):
     query = """
         MATCH (d:Disease {id: $disease_id})-[:DuG|DdG]-(:Gene)-[:CdG|CuG]-(c:Compound)

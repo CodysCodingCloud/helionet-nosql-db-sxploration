@@ -1,14 +1,13 @@
-from importlib.util import source_from_cache
-from socket import create_server
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 from src.hetionetDBInteraction import hetionetDBInteraction
-from neo4j import GraphDatabase, Driver, Session, ManagedTransaction
-from dotenv import load_dotenv
+from neo4j import GraphDatabase, Driver, Session
 from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
 from src.constants import EDGE_RELATIONS
 import src.neoTransactions as neoTransactions
-import os
-load_dotenv()
+
 HOST = os.getenv('NEO_HOST', "bolt://localhost")
 PORT = int(os.getenv('NEO_PORT', 7687))
 USERNAME = os.getenv('NEO_USER', "neo4j")

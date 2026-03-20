@@ -25,3 +25,19 @@ docker run -d --name redis -p 6379:6379 redis:<version>
 
 <!-- Installin ttkbootstrap for UI -->
 python -m pip install ttkbootstrap
+
+
+## Issues with tkinter
+- if you get a module not found error for `_tkinter`, follow the following steps
+- mac instructions
+    1. brew install tcl-tk@8 pkgconf
+    2. pyenv uninstall 3.13.2
+    3. env \
+        PATH="$(brew --prefix tcl-tk@8)/bin:$PATH" \
+        LDFLAGS="-L$(brew --prefix tcl-tk@8)/lib" \
+        CPPFLAGS="-I$(brew --prefix tcl-tk@8)/include" \
+        PKG_CONFIG_PATH="$(brew --prefix tcl-tk@8)/lib/pkgconfig" \
+        PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk@8)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk@8)/lib -ltcl8.6 -ltk8.6'" \
+        pyenv install 3.13.2
+    4. pyenv global 3.13.2
+    5. recreate your .venv
