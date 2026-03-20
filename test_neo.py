@@ -1,6 +1,9 @@
 import sys
+import os
+from dotenv import load_dotenv
 from src.Neo4jInteraction import Neo4jInteraction
-
+dd=os.getenv('DEBUG', '0')
+print(dd)
 option=0
 if len(sys.argv)>1:
     option=int(sys.argv[1])
