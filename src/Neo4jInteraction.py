@@ -112,13 +112,9 @@ class Neo4jInteraction(hetionetDBInteraction):
             else:
                 session: Session = driver.session(database=DB_NAME)
             session.execute_write(
+                neoTransactions.add_constraints)
+            session.execute_write(
                 neoTransactions.create_node_batch_tx, node_data)
-            # for node in node_data:
-            #     session.execute_write(
-            #         create_node_tx, id=node[0], name=node[1], kind=node[2])
-            # records, summary, keys = session.execute_query(insert_query,
-            #                                             id=node[0], name=node[1]
-            #                                             )
             session.close()
             if _driver:
                 _driver.close()

@@ -83,13 +83,15 @@ def get_all_untested_treatments(tx: ManagedTransaction):
 
 
 def add_constraints(tx: ManagedTransaction):
-    query = """
-    CREATE CONSTRAINT FOR (n:Gene) REQUIRE n.id IS UNIQUE;
-    CREATE CONSTRAINT FOR (n:Compound) REQUIRE n.id IS UNIQUE;
-    CREATE CONSTRAINT FOR (n:Disease) REQUIRE n.id IS UNIQUE;
-    CREATE CONSTRAINT FOR (n:Anatomy) REQUIRE n.id IS UNIQUE;
-    """
-    tx.run(query)
+
+    query = [
+        "CREATE CONSTRAINT FOR (n:Gene) REQUIRE n.id IS UNIQUE;",
+        "CREATE CONSTRAINT FOR (n:Compound) REQUIRE n.id IS UNIQUE;",
+        "CREATE CONSTRAINT FOR (n:Disease) REQUIRE n.id IS UNIQUE;",
+        "CREATE CONSTRAINT FOR (n:Anatomy) REQUIRE n.id IS UNIQUE;"
+    ]
+    for constraint_query in query:
+        tx.run(constraint_query)
 
 
 def create_node_batch_dict(data) -> dict:
@@ -168,7 +170,7 @@ def create_edge_batch_tx(tx: ManagedTransaction, data: dict):
         UNWIND $rows AS row
         MATCH (s:{src_label} {{id: row.src}})
         MATCH (t:{tgt_label} {{id: row.tgt}})
-        MERGE (s)-[r:{rel_type}]-(t)
+        MERGE (s)-[r:{rel_type}]->(t)
         """
 
         result = tx.run(unwind_query, rows=rel_data)
