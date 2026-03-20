@@ -4,11 +4,12 @@ from dotenv import load_dotenv
 
 from src.constants import EDGE_RELATIONS
 load_dotenv()
-dd=os.getenv('DEBUG', '0')
+dd = os.getenv('DEBUG', '0')
 print(dd)
 DEBUG = bool(os.getenv('DEBUG', '0') == "1")
 ALL_EDGES = bool(os.getenv('ALL_EDGES', '0') == "1")
-required_edges = ['DuG','DdG','CdG','CuG','CtD']
+required_edges = ['DuG', 'DdG', 'CdG', 'CuG', 'CtD']
+
 
 def get_all_diseases(tx: ManagedTransaction):
     query = f"""
@@ -19,8 +20,10 @@ def get_all_diseases(tx: ManagedTransaction):
     if DEBUG:
         print(result)
     return [record.data()['a'] for record in result]
-def get_disease_by_id(tx: ManagedTransaction,disease_id):
-    print("gotid: ",disease_id)
+
+
+def get_disease_by_id(tx: ManagedTransaction, disease_id):
+    print("gotid: ", disease_id)
     query = """
         MATCH (d:Disease {id: $disease_id})
         OPTIONAL MATCH (d)-[]-(dr:Drug)
@@ -38,7 +41,7 @@ def get_disease_by_id(tx: ManagedTransaction,disease_id):
             genes: genes
         } AS data
     """
-    result = tx.run(query,disease_id=disease_id)
+    result = tx.run(query, disease_id=disease_id)
     if DEBUG:
         print(result)
     try:
@@ -46,8 +49,9 @@ def get_disease_by_id(tx: ManagedTransaction,disease_id):
     except Exception as e:
         print(e)
         return result.data()
-    
-def get_disease_drug_interactions_by_id(tx: ManagedTransaction,disease_id):
+
+
+def get_disease_drug_interactions_by_id(tx: ManagedTransaction, disease_id):
     query = """
         MATCH (d:Disease {id: $disease_id})-[:DuG|DdG]-(:Gene)-[:CdG|CuG]-(c:Compound)
         WHERE (
@@ -61,6 +65,7 @@ def get_disease_drug_interactions_by_id(tx: ManagedTransaction,disease_id):
     if DEBUG:
         print(result)
     return [record.data()['c'] for record in result]
+
 
 def get_all_untested_treatments(tx: ManagedTransaction):
     query = """
@@ -76,6 +81,7 @@ def get_all_untested_treatments(tx: ManagedTransaction):
     if DEBUG:
         print(result)
     return [record.data() for record in result]
+
 
 def add_constraints(tx: ManagedTransaction):
     query = """
@@ -121,8 +127,8 @@ def create_node_batch_tx(tx: ManagedTransaction, data):
 def create_edge_batch_data(data) -> dict:
     try:
         edge_dict = {}
-        count=0
-        skipped=0
+        count = 0
+        skipped = 0
         for row in data:
             source = row[0]
             edge = row[1]
@@ -131,9 +137,9 @@ def create_edge_batch_data(data) -> dict:
             [target_label, target_id] = target.split("::")
             if not ALL_EDGES:
                 if edge not in required_edges:
-                    skipped+=1
+                    skipped += 1
                     continue
-            count+=1
+            count += 1
             key = (source_label, target_label, edge)
             elem_value = {"src": source_id, "tgt": target_id}
             edge_dict.setdefault(key, [])

@@ -2,12 +2,12 @@ import sys
 import os
 from dotenv import load_dotenv
 from src.Neo4jInteraction import Neo4jInteraction
-dd=os.getenv('DEBUG', '0')
+dd = os.getenv('DEBUG', '0')
 print(dd)
-option=0
-if len(sys.argv)>1:
-    option=int(sys.argv[1])
-disease_id="DOID:0050742"
+option = 0
+if len(sys.argv) > 1:
+    option = int(sys.argv[1])
+disease_id = "DOID:0050742"
 data = "nodata retrieved"
 match option:
     case 1:
@@ -43,7 +43,7 @@ match option:
         for d in data:
             data = inst.get_disease_drug_interactions_by_id(d['id'])
             print(data)
-        
+
     case 666:
         inst = Neo4jInteraction()
         inst.erase_db()

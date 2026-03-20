@@ -1,12 +1,12 @@
+import src.neoTransactions as neoTransactions
+from src.constants import EDGE_RELATIONS
+from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
+from neo4j import GraphDatabase, Driver, Session
+from src.hetionetDBInteraction import hetionetDBInteraction
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.hetionetDBInteraction import hetionetDBInteraction
-from neo4j import GraphDatabase, Driver, Session
-from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
-from src.constants import EDGE_RELATIONS
-import src.neoTransactions as neoTransactions
 
 HOST = os.getenv('NEO_HOST', "bolt://localhost")
 PORT = int(os.getenv('NEO_PORT', 7687))
@@ -53,10 +53,11 @@ class Neo4jInteraction(hetionetDBInteraction):
             _driver.close()
         except Exception as e:
             print(e)
-            res=[]
+            res = []
         finally:
             print("get_all_diseases completed")
         return res
+
     def get_disease_by_id(self, disease_id) -> dict:
         """
         Given a disease id, what is its name, what are drug names that can treat or palliate this disease, what are gene names that cause this disease, and where this disease occurs? Obtain and output this information in a single query.
@@ -64,12 +65,13 @@ class Neo4jInteraction(hetionetDBInteraction):
         try:
             _driver = self.db_conn_service()
             session: Session = _driver.session(database=DB_NAME)
-            res = session.execute_read(neoTransactions.get_disease_by_id,disease_id)
+            res = session.execute_read(
+                neoTransactions.get_disease_by_id, disease_id)
             session.close()
             _driver.close()
         except Exception as e:
             print(e)
-            res={}
+            res = {}
         finally:
             print("get_all_diseases completed")
         return res
@@ -81,12 +83,13 @@ class Neo4jInteraction(hetionetDBInteraction):
         try:
             _driver = self.db_conn_service()
             session: Session = _driver.session(database=DB_NAME)
-            res = session.execute_read(neoTransactions.get_disease_drug_interactions_by_id,disease_id)
+            res = session.execute_read(
+                neoTransactions.get_disease_drug_interactions_by_id, disease_id)
             session.close()
             _driver.close()
         except Exception as e:
             print(e)
-            res={}
+            res = {}
         finally:
             print("get_all_diseases completed")
         return res
@@ -104,7 +107,8 @@ class Neo4jInteraction(hetionetDBInteraction):
                 session: Session = _driver.session(database=DB_NAME)
             else:
                 session: Session = driver.session(database=DB_NAME)
-            session.execute_write(neoTransactions.create_node_batch_tx, node_data)
+            session.execute_write(
+                neoTransactions.create_node_batch_tx, node_data)
             # for node in node_data:
             #     session.execute_write(
             #         create_node_tx, id=node[0], name=node[1], kind=node[2])
@@ -131,7 +135,8 @@ class Neo4jInteraction(hetionetDBInteraction):
                 session: Session = _driver.session(database=DB_NAME)
             else:
                 session: Session = driver.session(database=DB_NAME)
-            session.execute_write(neoTransactions.create_edge_batch_tx, node_data)
+            session.execute_write(
+                neoTransactions.create_edge_batch_tx, node_data)
 
             # for node in node_data:
             #     session.execute_write(
@@ -186,4 +191,3 @@ class Neo4jInteraction(hetionetDBInteraction):
         # record = result.records[0]
         # print(f"Nodes: {record['nodeCount']}")
         # print(f"Relationships: {record['relCount']}")
-
