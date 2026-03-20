@@ -49,7 +49,7 @@ class Neo4jInteraction(hetionetDBInteraction):
         try:
             _driver = self.db_conn_service()
             session: Session = _driver.session(database=DB_NAME)
-            session.execute_read(neoTransactions.get_all_diseases)
+            res = session.execute_read(neoTransactions.get_all_diseases)
             session.close()
             _driver.close()
         except Exception as e:

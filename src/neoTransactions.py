@@ -18,30 +18,45 @@ def get_all_diseases(tx: ManagedTransaction):
     result = tx.run(query)
     if DEBUG:
         print(result)
-    return result
+    return [record.data()['a'] for record in result]
 def get_disease_by_id(tx: ManagedTransaction,disease_id):
-    query = f"""
-    MATCH (a:Disease id: $disease_id)
-    RETURN a
+    query = """
+    MATCH (d:Disease {id: $disease_id})
+    RETURN d
     """
     result = tx.run(query,disease_id=disease_id)
     if DEBUG:
         print(result)
-    return result
+    return [record.data()['d'] for record in result]
 def get_disease_drug_interactions_by_id(tx: ManagedTransaction,disease_id):
     query = """
-        MATCH (d:Disease {id: $disease_id})-[:DuG|DdG]-(:Gene)-[:DuG|DdG]-(c:Compound)
+        MATCH (d:Disease {id: $disease_id})-[:DuG|DdG]-(:Gene)-[:CdG|CuG]-(c:Compound)
         WHERE (
-        ((d)-[:DuG]->(:Gene)<-[CdG]-(c)) OR 
-        ((d)-[:DdG]->(:Gene)<-[:CuG]-(c))
+            ((d)-[:DuG]->(:Gene)<-[:CdG]-(c)) OR 
+            ((d)-[:DdG]->(:Gene)<-[:CuG]-(c))
         )
         AND NOT (c)-[:CtD]->(d)
         RETURN DISTINCT c
     """
+    result = tx.run(query, disease_id=disease_id)
+    if DEBUG:
+        print(result)
+    return [record.data()['c'] for record in result]
+
+def get_all_untested_treatments(tx: ManagedTransaction):
+    query = """
+        MATCH (d:Disease)-[:DuG|DdG]-(:Gene)-[:CdG|CuG]-(c:Compound)
+        WHERE (
+            ((d)-[:DuG]->(:Gene)<-[:CdG]-(c)) OR 
+            ((d)-[:DdG]->(:Gene)<-[:CuG]-(c))
+        )
+        AND NOT (c)-[:CtD]->(d)
+        RETURN d, collect(distinct c) AS Compounds
+    """
     result = tx.run(query)
     if DEBUG:
         print(result)
-    return result
+    return [record.data() for record in result]
 
 def add_constraints(tx: ManagedTransaction):
     query = """
@@ -117,19 +132,19 @@ def create_edge_batch_tx(tx: ManagedTransaction, data: dict):
     for (src_label, tgt_label, rel_type), rel_data in batch_data.items():
         if DEBUG:
             print(src_label, rel_type, tgt_label, len(rel_data))
-        match rel_type:
-            case EDGE_RELATIONS.GrG:
-                rel_dir = '>'
-                rel_type = 'GrG'
-                print(rel_type, rel_dir)
-            case _:
-                rel_dir = ""
+        # match rel_type:
+        #     case EDGE_RELATIONS.GrG:
+        #         rel_dir = '>'
+        #         rel_type = 'GrG'
+        #         print(rel_type, rel_dir)
+        #     case _:
+        #         rel_dir = ""
 
         unwind_query = f"""
         UNWIND $rows AS row
         MATCH (s:{src_label} {{id: row.src}})
         MATCH (t:{tgt_label} {{id: row.tgt}})
-        MERGE (s)-[r:{rel_type}]-{rel_dir}(t)
+        MERGE (s)-[r:{rel_type}]-(t)
         """
 
         result = tx.run(unwind_query, rows=rel_data)
