@@ -2,6 +2,9 @@ import sys
 import os
 from dotenv import load_dotenv
 from src.Neo4jInteraction import Neo4jInteraction
+from src.RedisInteraction import RedisInteraction
+from src.parse_data import DATA_FILE_LOCATIONS
+
 dd = os.getenv('DEBUG', '0')
 print(dd)
 option = 0
@@ -46,7 +49,17 @@ match option:
         for d in data:
             data = inst.get_disease_drug_interactions_by_id(d['id'])
             print(data)
-
+    case 21:
+        inst = RedisInteraction()
+        # data = inst.db_conn_service()
+    case 24:
+        inst = RedisInteraction()
+        nodes_path = DATA_FILE_LOCATIONS.node
+        edges_path = DATA_FILE_LOCATIONS.edge
+        data = inst.load_hetionet_to_redis(nodes_path,edges_path)
+    case 27:
+        inst = RedisInteraction()
+        data = inst.get_disease_by_id(disease_id)
     case 666:
         inst = Neo4jInteraction()
         inst.erase_db()

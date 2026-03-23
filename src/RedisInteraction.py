@@ -24,7 +24,7 @@ class RedisInteraction(hetionetDBInteraction):
 
         try:
             if response:
-                print ("Success")
+                print ("Successful conn to redis")
         except Exception as e:
             print(f"Something was down :( check it out: {e}" )
             
