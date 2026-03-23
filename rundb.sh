@@ -41,6 +41,6 @@ case "$STEP" in
     ;;
     "t2")
     source .venv/bin/activate
-    python test_neo.py "$PYARG" "$DISEASE_ID"
+    python test_funcs.py "$PYARG" "$DISEASE_ID"
     ;;
 esac
