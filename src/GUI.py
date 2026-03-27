@@ -39,12 +39,15 @@ def close_GUI():
 
 def get_all_diseases():
     match(DB_USAGE_TYPE):
-        case DB_USAGE_TYPE_ENUMS.neo:
-            data = neo.get_all_diseases()
-        case _:
+        case DB_USAGE_TYPE_ENUMS.redis:
             data = redis.get_all_diseases()
-    if isinstance(data[0], dict):
-        data = [dat.get('id') for dat in data]
+        case _:
+            data = neo.get_all_diseases()
+    try:
+        if isinstance(data[0], dict):
+            data = [dat.get('id') for dat in data]
+    except Exception as e:
+        return data
     return data
 
 
@@ -62,13 +65,13 @@ def get_disease_id():
     else:
         print("I didn't get that, can please you enter the disease ID again?")
     print("gotdata", data)
-    report = (f"DISEASE: {data['name']}\n"
-              f"DRUGS: {', '.join(data['drugs'])}\n"
-              f"LOCATIONS: {', '.join(data['locations'])}\n"
-              f"GENES: {', '.join(data['genes'])}")
+    report = (f"DISEASE:\t\t{data['name']}\n"
+              f"DRUGS:\t\t{', '.join(data['drugs'])}\n"
+              f"LOCATIONS:\t\t{', '.join(data['locations'])}\n"
+              f"GENES:\t\t{', '.join(data['genes'])}")
 
     result_label.text.delete('1.0', END)
-    result_label.text.insert(END, f"Results:\n {report}")
+    result_label.text.insert(END, f"Results:\n{report}")
     result_label.pack(fill=BOTH, expand=YES, padx=20, pady=20)
 
 

@@ -19,7 +19,7 @@ def get_disease_info(disease_id, mode):
                 f"LOCATIONS:\t{', '.join(data['locations'])}\n"
                 f"GENES:\t{', '.join(data['genes'])}"
             )
-            print(f"Results:\n {report}")
+            print(f"Results:\n{report}")
         case '2':
             compound_list = neo_interface.get_disease_drug_interactions_by_id(disease_id)
             if not compound_list:
