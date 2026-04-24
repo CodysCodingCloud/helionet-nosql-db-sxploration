@@ -1,6 +1,20 @@
+import os
+
+import sys
+from dotenv import load_dotenv
+
 from pyspark.sql import SparkSession, DataFrame
 from operator import add
 from src.constants import EDGE_RELATIONS
+from src.Neo4jInteraction import Neo4jInteraction
+
+load_dotenv()
+DEBUG = os.getenv('DEBUG', '0')
+DATA_RETRIEVAL = os.getenv('DATA_RETRIEVAL', 0) 
+class DataRetrieval:
+    tsv=0
+    neo=1
+
 # from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
 # edges_fp = DATA_FILE_LOCATIONS.edge
 # edges_fp = "/opt/spark/data/edges.tsv"
@@ -26,8 +40,24 @@ class SparkAggregator():
             .getOrCreate()
         print(f"spark session created {spark}")
         self.spark = spark
-
-    def read_data(self):
+        self.set_data()
+    def set_data(self):
+        match DATA_RETRIEVAL:
+            case DataRetrieval.neo:
+                self.get_neo_data()
+            case DataRetrieval.tsv:
+                self.read_tsv_data()
+            case _:
+                self.read_tsv_data()
+        pass
+    def get_neo_data(self):
+        neo_inst = Neo4jInteraction()
+        edge_data = neo_inst.get_compound_gd_edges(compound_disease_edges+compound_gene_edges)
+        disease_data = neo_inst.get_disease_list(compound_disease_edges+compound_gene_edges)
+        spark = self.spark
+        self.df=spark.createDataFrame(edge_data)
+        self.df_nodes=spark.createDataFrame(disease_data)
+    def read_tsv_data(self):
         # Standard way to read a TSV
         print(f"reading {edges_fp}")
         spark = self.spark
@@ -99,7 +129,6 @@ class SparkAggregator():
         Compute the number of diseases associated with 1, 2, 3, …, n drugs. Output results with the top 5 number of diseases in a descending order.
         """
         rdd = self.df.rdd
-        rdd_nodes = self.df_nodes.rdd
 
         def rdd_map(row):
             row = (row["target"], 1)

@@ -4,7 +4,6 @@ from src.SparkAggregator import SparkAggregator
 
 def main():
     s = SparkAggregator()
-    # s.read_data()
     q1 = s.get_drug_by_num_genes_with_num_diseases()
     q2 = s.get_disease_by_drugs()
     q3 = s.get_drug_by_genes()
