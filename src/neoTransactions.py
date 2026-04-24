@@ -208,21 +208,22 @@ def create_edge_tx(tx: ManagedTransaction, source: str, edge, target: str):
 
 def get_compound_gd_edges_tx(tx: ManagedTransaction , edges):
     interesested_edges = '|'.join(edges)
+    print(interesested_edges)
     query = f"""
-        MATCH (c:Compound)-[:{interesested_edges}]-(x)
-        RETURN (c, x)
+        MATCH (c:Compound)-[e:{interesested_edges}]-(x)
+        RETURN c.id as source, e, x.id as target
     """
     result = tx.run(query)
     if DEBUG:
         print(result)
-    return [record.data() for record in result]
+    return [(record["source"], record["e"].type,record["target"]) for record in result]
 
 def get_disease_list_tx(tx: ManagedTransaction):
     query = f"""
         MATCH (d:Disease)
-        RETURN d
+        RETURN d.id as id, d.name as name
     """
     result = tx.run(query)
     if DEBUG:
         print(result)
-    return [record.data() for record in result]
+    return [(record['id'], record['name']) for record in result]

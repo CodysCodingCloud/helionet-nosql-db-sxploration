@@ -10,7 +10,8 @@ from src.Neo4jInteraction import Neo4jInteraction
 
 load_dotenv()
 DEBUG = os.getenv('DEBUG', '0')
-DATA_RETRIEVAL = os.getenv('DATA_RETRIEVAL', 0) 
+DATA_RETRIEVAL = os.getenv('DATA_RETRIEVAL', 0)
+DATA_RETRIEVAL = int(DATA_RETRIEVAL) if DATA_RETRIEVAL.isdigit() else 0
 class DataRetrieval:
     tsv=0
     neo=1
@@ -53,10 +54,14 @@ class SparkAggregator():
     def get_neo_data(self):
         neo_inst = Neo4jInteraction()
         edge_data = neo_inst.get_compound_gd_edges(compound_disease_edges+compound_gene_edges)
-        disease_data = neo_inst.get_disease_list(compound_disease_edges+compound_gene_edges)
+        disease_data = neo_inst.get_disease_list()
+        print(edge_data[:10])
+        print(disease_data[:10])
         spark = self.spark
-        self.df=spark.createDataFrame(edge_data)
-        self.df_nodes=spark.createDataFrame(disease_data)
+        self.df=spark.createDataFrame(edge_data, schema=["source",	"metaedge",	"target"])
+        self.df.show(5)
+        self.df_nodes=spark.createDataFrame(disease_data, schema=['id',"name"])
+        self.df_nodes.show(5)
     def read_tsv_data(self):
         # Standard way to read a TSV
         print(f"reading {edges_fp}")
