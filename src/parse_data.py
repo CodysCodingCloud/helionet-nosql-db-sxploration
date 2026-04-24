@@ -1,9 +1,9 @@
 import os
 import csv
-
+from constants import EDGE_RELATIONS
 EDGES_FN = "edges.tsv"
 NODES_FN = "nodes.tsv"
-
+SUBSET_FN="edges_subset.tsv"
 working_directory = os.path.dirname(__file__)
 
 
@@ -56,6 +56,38 @@ def get_data_from_file(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.
         return (None, None)
 
 
+def create_data_subset(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.node, DEBUG=False):
+    """
+    writes a new tsv with only the required edges for proj2 with drugs, edges,diseases
+    """
+    try:
+        
+        if DEBUG:
+            print(f"location at {file_location}")
+        data = []
+        with open(file_location, "r", encoding="utf-8") as f, \
+            open("edges_subset.tsv", "w", encoding="utf-8") as f_out:
+            tsv_reader = csv.reader(f, delimiter='\t')
+            header = None
+            # Skip the first line and get headers
+            header = next(tsv_reader, None)
+            f_out.write('\t'.join(header)+'\n')
+
+            interested_metaedge = [EDGE_RELATIONS.CuG, EDGE_RELATIONS.CdG, EDGE_RELATIONS.CpD, EDGE_RELATIONS.CpD, EDGE_RELATIONS.CtD, EDGE_RELATIONS.CbG]
+
+            for row in tsv_reader:
+                if row[1] in interested_metaedge:
+                    f_out.write('\t'.join(row)+'\n')
+
+        if DEBUG:
+            print(header)  # ['id', 'name', 'kind']
+        return (header, data)
+    except Exception as e:
+        print(e)
+        return (None, None)
+
+
 if __name__ == "__main__":
-    get_data_from_file(DATA_FILE_LOCATIONS.node, DEBUG=True)
-    get_data_from_file(DATA_FILE_LOCATIONS.edge, DEBUG=True)
+    # get_data_from_file(DATA_FILE_LOCATIONS.node, DEBUG=True)
+    # get_data_from_file(DATA_FILE_LOCATIONS.edge, DEBUG=True)
+    create_data_subset(DATA_FILE_LOCATIONS.edge, DEBUG=True)
