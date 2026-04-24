@@ -32,6 +32,13 @@ elif [ "$STEP" = "21" ]; then
     export JDK_JAVA_OPTIONS="-Djava.security.manager=allow"
     python -m pip install -r requirements.txt
     python pytmr.py
+elif [ "$STEP" = "20" ]; then
+    # for running pyspark aggregator with mapreduce
+    source .venv/bin/activate
+    # java bug
+    export JDK_JAVA_OPTIONS="-Djava.security.manager=allow"
+    python -m pip install -r requirements.txt
+    python pytmr.py 0
 elif [ "$STEP" = "666" ]; then
     docker compose down -v
 fi

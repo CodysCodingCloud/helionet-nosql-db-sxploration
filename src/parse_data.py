@@ -56,7 +56,7 @@ def get_data_from_file(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.
         return (None, None)
 
 
-def create_data_subset(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.node, DEBUG=False):
+def create_data_subset(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.edge, DEBUG=False):
     """
     writes a new tsv with only the required edges for proj2 with drugs, edges,diseases
     """
@@ -73,15 +73,21 @@ def create_data_subset(file_location: DATA_FILE_LOCATIONS = DATA_FILE_LOCATIONS.
             header = next(tsv_reader, None)
             f_out.write('\t'.join(header)+'\n')
 
-            interested_metaedge = [EDGE_RELATIONS.CuG, EDGE_RELATIONS.CdG, EDGE_RELATIONS.CpD, EDGE_RELATIONS.CpD, EDGE_RELATIONS.CtD, EDGE_RELATIONS.CbG]
-
+            interested_metaedge = [EDGE_RELATIONS.CuG, EDGE_RELATIONS.CdG, EDGE_RELATIONS.CbG, EDGE_RELATIONS.CpD, EDGE_RELATIONS.CtD]
+            count=0
+            s = set()
             for row in tsv_reader:
                 if row[1] in interested_metaedge:
-                    f_out.write('\t'.join(row)+'\n')
+                    count+=1
+                    text = '\t'.join(row)+'\n'
+                    s.add(text)
+                    f_out.write(text)
 
         if DEBUG:
             print(header)  # ['id', 'name', 'kind']
-        return (header, data)
+            print(count)  # ['id', 'name', 'kind']
+            print(len(s))  # ['id', 'name', 'kind']
+        return (header, tsv_reader)
     except Exception as e:
         print(e)
         return (None, None)

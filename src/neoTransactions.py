@@ -2,12 +2,12 @@ import os
 from neo4j import ManagedTransaction
 from dotenv import load_dotenv
 
-from src.constants import EDGE_RELATIONS
+# from src.constants import EDGE_RELATIONS
 load_dotenv()
 dd = os.getenv('DEBUG', '0')
 DEBUG = bool(os.getenv('DEBUG', '0') == "1")
 ALL_EDGES = bool(os.getenv('ALL_EDGES', '0') == "1")
-required_edges = ['DuG', 'DdG', 'CdG', 'CuG', 'CtD']
+required_edges = ['DuG', 'DdG', 'CdG', 'CuG', 'CtD', 'CbG', 'CpD']
 
 
 def get_all_diseases(tx: ManagedTransaction):
@@ -216,11 +216,11 @@ def get_compound_gd_edges_tx(tx: ManagedTransaction , edges):
     result = tx.run(query)
     if DEBUG:
         print(result)
-    return [(record["source"], record["e"].type,record["target"]) for record in result]
+    return [(str(record["source"]), str(record["e"].type),str(record["target"])) for record in result]
 
 def get_disease_list_tx(tx: ManagedTransaction):
     query = f"""
-        MATCH (d:Disease)
+        MATCH (d:Compound)
         RETURN d.id as id, d.name as name, labels(d) as kind
     """
     result = tx.run(query)

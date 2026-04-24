@@ -23,8 +23,7 @@ nodes_fp = "nodes.tsv"
 edges_fp = "edges_subset.tsv"
 compound_gene_edges = [EDGE_RELATIONS.CuG,
                        EDGE_RELATIONS.CdG, EDGE_RELATIONS.CbG]
-compound_disease_edges = [EDGE_RELATIONS.CpD,
-                          EDGE_RELATIONS.CpD, EDGE_RELATIONS.CtD]
+compound_disease_edges = [EDGE_RELATIONS.CpD, EDGE_RELATIONS.CtD]
 
 
 class SparkAggregator():
@@ -58,10 +57,13 @@ class SparkAggregator():
         print(edge_data[:10])
         print(disease_data[:10])
         spark = self.spark
+        print(f"First row check: {edge_data[0]}") 
         self.df=spark.createDataFrame(edge_data, schema=["source",	"metaedge",	"target"])
-        self.df.show(5)
         self.df_nodes=spark.createDataFrame(disease_data, schema=['id',"name","kind"])
+        self.df.show(5)
         self.df_nodes.show(5)
+        print(self.df.count())
+        print(self.df_nodes.count())
     def read_tsv_data(self):
         # Standard way to read a TSV
         print(f"reading {edges_fp}")
@@ -74,6 +76,10 @@ class SparkAggregator():
         # df.show(5)
         self.df = df
         self.df_nodes = df_nodes
+        self.df.show(5)
+        self.df_nodes.show(5)
+        print(df.count())
+        print(df_nodes.count())
         # print(f"done reading")
 
         # print(df[0:5])

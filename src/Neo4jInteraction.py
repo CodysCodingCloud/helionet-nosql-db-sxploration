@@ -1,10 +1,12 @@
-import src.neoTransactions as neoTransactions
-from src.constants import EDGE_RELATIONS
-from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
-from neo4j import GraphDatabase, Driver, Session
-from src.hetionetDBInteraction import hetionetDBInteraction
 import os
 from dotenv import load_dotenv
+from neo4j import GraphDatabase, Driver, Session
+
+import src.neoTransactions as neoTransactions
+# from src.constants import EDGE_RELATIONS
+from src.parse_data import get_data_from_file, DATA_FILE_LOCATIONS
+from src.hetionetDBInteraction import hetionetDBInteraction
+
 load_dotenv()
 
 

@@ -5,6 +5,8 @@ from src.Neo4jInteraction import Neo4jInteraction
 from src.RedisInteraction import RedisInteraction
 from src.parse_data import DATA_FILE_LOCATIONS
 
+load_dotenv()
+
 dd = os.getenv('DEBUG', '0')
 print(dd)
 option = 0
