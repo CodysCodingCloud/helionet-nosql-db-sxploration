@@ -15,19 +15,23 @@ elif [ "$STEP" = "2" ]; then
 elif [ "$STEP" = "3" ]; then
     source .venv/bin/activate
     python -m pip install -r requirements.txt
-    # python gcloud_deploy_rf.sh local 11
 elif [ "$STEP" = "4" ]; then
     # for running GUI version of the project 
     source .venv/bin/activate
     python -m pip install -r requirements.txt
     python main.py
-    # python gcloud_deploy_rf.sh local 11
 elif [ "$STEP" = "5" ]; then
     # for running python terminal version of the project 
     source .venv/bin/activate
     python -m pip install -r requirements.txt
     python pyt.py
-    # python gcloud_deploy_rf.sh local 11
+elif [ "$STEP" = "21" ]; then
+    # for running pyspark aggregator with mapreduce
+    source .venv/bin/activate
+    # java bug
+    export JDK_JAVA_OPTIONS="-Djava.security.manager=allow"
+    python -m pip install -r requirements.txt
+    python pytmr.py
 elif [ "$STEP" = "666" ]; then
     docker compose down -v
 fi

@@ -4,3 +4,6 @@ neo4j
 redis
 python-dotenv
 ttkbootstrap
+pyspark
+pyspark-client
+psutil

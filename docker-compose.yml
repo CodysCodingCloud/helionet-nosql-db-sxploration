@@ -78,8 +78,43 @@ services:
   #     interval: 30s
   #     timeout: 10s
   #     retries: 5
+  spark-master:
+    image: apache/spark:latest
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      # - JDK_JAVA_OPTIONS=-Djava.security.manager=allow
+      # - SPARK_NO_DAEMONIZE=true
+      - SPARK_MASTER_OPTS=-Djava.security.manager=allow -Dspark.plugins=org.apache.spark.sql.connect.SparkConnectPlugin
+   
+    ports:
+      - "8080:8080" # Spark Master Web UI
+      - "7077:7077" # Spark Master Port
+      - "15002:15002"
+    volumes:
+      - ./edges_subset.tsv:/opt/spark/data/edges.tsv
+    networks:
+      - spark-network
 
-# 4. Defines 'mongo_data' so Docker knows it is a named volume
+  spark-worker:
+    image: apache/spark:latest
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    environment:
+      # - SPARK_MODE=worker
+      # - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_WORKER_OPTS=-Djava.security.manager=allow
+      - JDK_JAVA_OPTIONS=-Djava.security.manager=allow
+    depends_on:
+      - spark-master
+    volumes:
+      - ./edges_subset.tsv:/opt/spark/data/edges.tsv
+    networks:
+      - spark-network
+
 volumes:
   # mongo_data:
   # pgdata:
@@ -88,3 +123,7 @@ volumes:
   neo4j_plugins:
   redis-data:
   # cassandra-data:
+
+networks:
+  spark-network:
+    driver: bridge
