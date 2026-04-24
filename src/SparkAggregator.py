@@ -60,7 +60,7 @@ class SparkAggregator():
         spark = self.spark
         self.df=spark.createDataFrame(edge_data, schema=["source",	"metaedge",	"target"])
         self.df.show(5)
-        self.df_nodes=spark.createDataFrame(disease_data, schema=['id',"name"])
+        self.df_nodes=spark.createDataFrame(disease_data, schema=['id',"name","kind"])
         self.df_nodes.show(5)
     def read_tsv_data(self):
         # Standard way to read a TSV

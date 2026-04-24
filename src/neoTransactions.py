@@ -221,9 +221,9 @@ def get_compound_gd_edges_tx(tx: ManagedTransaction , edges):
 def get_disease_list_tx(tx: ManagedTransaction):
     query = f"""
         MATCH (d:Disease)
-        RETURN d.id as id, d.name as name
+        RETURN d.id as id, d.name as name, labels(d) as kind
     """
     result = tx.run(query)
     if DEBUG:
-        print(result)
-    return [(record['id'], record['name']) for record in result]
+        print(result[:10])
+    return [(record['id'], record['name'], record['kind'][0]) for record in result]
