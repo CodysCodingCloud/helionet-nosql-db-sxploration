@@ -20,7 +20,6 @@ def get_all_diseases(tx: ManagedTransaction):
         print(result)
     return [record.data()['a'] for record in result]
 
-
 def get_disease_by_id(tx: ManagedTransaction, disease_id):
     print("gotid: ", disease_id)
     query = """
@@ -205,3 +204,25 @@ def create_edge_tx(tx: ManagedTransaction, source: str, edge, target: str):
     result = tx.run(insert_query, source_id=source_id, target_id=target_id)
     if DEBUG:
         print(result)
+
+
+def get_compound_gd_edges_tx(tx: ManagedTransaction , edges):
+    interesested_edges = '|'.join(edges)
+    query = f"""
+        MATCH (c:Compound)-[:{interesested_edges}]-(x)
+        RETURN (c, x)
+    """
+    result = tx.run(query)
+    if DEBUG:
+        print(result)
+    return [record.data() for record in result]
+
+def get_disease_list_tx(tx: ManagedTransaction):
+    query = f"""
+        MATCH (d:Disease)
+        RETURN d
+    """
+    result = tx.run(query)
+    if DEBUG:
+        print(result)
+    return [record.data() for record in result]

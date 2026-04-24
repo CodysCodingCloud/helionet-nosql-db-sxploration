@@ -99,6 +99,40 @@ class Neo4jInteraction(hetionetDBInteraction):
         return res
         # pass
 
+    def get_compound_gd_edges(self, edges):
+
+        try:
+            _driver = self.db_conn_service()
+            session: Session = _driver.session(database=DB_NAME)
+            res = session.execute_read(
+                neoTransactions.get_compound_gd_edges_tx, edges)
+            session.close()
+            _driver.close()
+        except Exception as e:
+            print(e)
+            res = {}
+        finally:
+            if DEBUG:
+                print("get_all_diseases completed")
+        return res
+
+    def get_disease_list(self):
+
+        try:
+            _driver = self.db_conn_service()
+            session: Session = _driver.session(database=DB_NAME)
+            res = session.execute_read(
+                neoTransactions.get_disease_list_tx)
+            session.close()
+            _driver.close()
+        except Exception as e:
+            print(e)
+            res = {}
+        finally:
+            if DEBUG:
+                print("get_diseases completed")
+        return res
+
     def populate_nodes(self, driver: Driver = None):
         try:
             node_header, node_data = get_data_from_file(
