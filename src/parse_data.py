@@ -1,6 +1,6 @@
 import os
 import csv
-from constants import EDGE_RELATIONS
+from src.constants import EDGE_RELATIONS
 EDGES_FN = "edges.tsv"
 NODES_FN = "nodes.tsv"
 SUBSET_FN="edges_subset.tsv"
