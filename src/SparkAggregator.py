@@ -143,8 +143,8 @@ class SparkAggregator():
             return rdd[1]
 
         filtered_rdd = rdd.filter(
-            lambda row: row["metaedge"] in compound_gene_edges)
-        mapped_rdd = filtered_rdd.map(lambda row: (row["source"], 1))
+            lambda row: row["metaedge"] in compound_disease_edges)
+        mapped_rdd = filtered_rdd.map(lambda row: (row["target"], 1))
         counts_rdd = mapped_rdd.reduceByKey(lambda a, b: a+b)
         reversed_rdd = counts_rdd.map(lambda x: (x[1], 1))
         counted_by_frequency = reversed_rdd.reduceByKey(lambda a, b: a+b)

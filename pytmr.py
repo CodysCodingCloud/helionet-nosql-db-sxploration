@@ -25,7 +25,7 @@ if __name__ == "__main__":
 #           ('Compound::DB00997', (532, 17)),
 #           ('Compound::DB00570', (523, 7)),
 #           ('Compound::DB00390', (522, 2))]
-# q2_ans = [(1, 117), (3, 103), (2, 103), (5, 91), (4, 75)]
+# q2_ans = [(1, 10), (2, 7), (11, 6), (9, 6), (3, 6)]
 # q3_ans = [('Compound::DB08865', (585, 'Crizotinib')),
 #           ('Compound::DB01254', (564, 'Dasatinib')),
 #           ('Compound::DB00997', (532, 'Doxorubicin')),
